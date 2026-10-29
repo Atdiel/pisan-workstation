@@ -38,6 +38,34 @@ export default function App() {
   } = useAuth();
   const presence = usePresence(authenticated);
   const now = useNow();
+  const refreshPresence = presence.refresh;
+  const [appVersion, setAppVersion] = useState<string | null>(null);
+
+  // La versión instalada la conoce Electron; no se escribe a mano en la UI.
+  useEffect(() => {
+    let cancelled = false;
+    const device = window.pisan?.device;
+    if (!device) return;
+
+    void device
+      .getInfo()
+      .then((info) => {
+        if (!cancelled) setAppVersion(info.appVersion);
+      })
+      .catch((error: unknown) => {
+        console.warn("No se pudo obtener la versión de la app:", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Al volver a Estado se pide una foto aunque el WebSocket haya perdido
+  // algún evento o la otra sesión haya cambiado mientras la vista estaba oculta.
+  useEffect(() => {
+    if (activeTab === "status") void refreshPresence();
+  }, [activeTab, refreshPresence]);
 
   const myEntry = user ? presence.entriesById[user.id] : undefined;
   const myStatus: PresenceStatus = user
@@ -236,7 +264,7 @@ export default function App() {
             Sistema en línea */}
           </div>
           <div>
-            PISANTECH Suite v1.0.0
+            PISANTECH Suite{appVersion ? ` v${appVersion}` : ""}
           </div>
         </footer>
       </div>

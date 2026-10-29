@@ -25,6 +25,7 @@ export interface PresenceApi {
   workSchedule: WorkScheduleInfo;
   loading: boolean;
   error: string | null;
+  refresh: () => Promise<void>;
   updateStatus: (
     status: UserStatusType,
     activity?: string,
@@ -103,6 +104,18 @@ export function usePresence(enabled: boolean): PresenceApi {
 
   useStatusSocket(enabled, handleChanged, handleSnapshot);
 
+  /** Fuerza una foto actual; sirve al volver a la pestaña de estado. */
+  const refresh = useCallback(async () => {
+    if (!enabled) return;
+
+    try {
+      applySnapshot(await fetchStatusSnapshot());
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  }, [enabled, applySnapshot]);
+
   const updateStatus = useCallback(
     async (status: UserStatusType, activity?: string) => {
       const entry = await updateMyStatus(status, activity);
@@ -117,6 +130,7 @@ export function usePresence(enabled: boolean): PresenceApi {
     workSchedule,
     loading,
     error,
+    refresh,
     updateStatus,
   };
 }
