@@ -1,0 +1,95 @@
+name: Release desktop
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag existente que se va a publicar, por ejemplo v0.1.0"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      VITE_API_URL: ${{ vars.VITE_API_URL || 'https://pisan-backend.onrender.com' }}
+      # Primera etapa sin firma. Evita que electron-builder busque certificados.
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate tag against package.json
+        shell: bash
+        run: node scripts/check-release-tag.mjs "${{ inputs.tag || github.ref_name }}"
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Build renderer and Electron entrypoints
+        run: npm run build:renderer
+
+      - name: Package Windows installer
+        run: npm run package:win
+
+      - name: Generate SHA-256 checksum
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem "release" -Recurse -Filter "*Setup.exe" | Select-Object -First 1
+          if (-not $installer) {
+            throw "No se encontró el instalador .exe generado por electron-builder."
+          }
+          $hash = (Get-FileHash $installer.FullName -Algorithm SHA256).Hash.ToLower()
+          "$hash  $($installer.Name)" | Set-Content -Path "release\checksums.txt" -Encoding ascii
+          Get-Content "release\checksums.txt"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: |
+            release/*/PISANTECH-Workstation-Windows-*-Setup.exe
+            release/checksums.txt
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Create draft GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag || github.ref_name }}
+          name: PISANTECH Workstation ${{ inputs.tag || github.ref_name }}
+          draft: true
+          prerelease: ${{ contains(inputs.tag || github.ref_name, '-') }}
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          files: |
+            release/*/PISANTECH-Workstation-Windows-*-Setup.exe
+            release/checksums.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
