@@ -15,7 +15,7 @@
     "target": [
       "dmg"
     ],
-    "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
+    "artifactName": "PISANTECH-Workstation-Mac-${version}-Installer.${ext}"
   },
   "win": {
     "target": [
@@ -26,7 +26,7 @@
         ]
       }
     ],
-    "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
+    "artifactName": "PISANTECH-Workstation-Windows-${version}-Setup.${ext}"
   },
   "nsis": {
     "oneClick": false,
@@ -38,6 +38,6 @@
     "target": [
       "AppImage"
     ],
-    "artifactName": "${productName}-Linux-${version}.${ext}"
+    "artifactName": "PISANTECH-Workstation-Linux-${version}.${ext}"
   }
 }

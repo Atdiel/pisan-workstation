@@ -5,11 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && electron-builder",
+    "build": "npm run build:renderer && npm run package",
+    "build:renderer": "tsc && vite build",
+    "package": "electron-builder --publish never",
+    "package:win": "electron-builder --win --publish never",
+    "package:mac": "electron-builder --mac --publish never",
+    "package:linux": "electron-builder --linux --publish never",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "version:check": "node scripts/suite-version.mjs check",
-    "release:set": "node scripts/suite-version.mjs set"
+    "release:set": "node scripts/suite-version.mjs set",
+    "release:tag-check": "node scripts/check-release-tag.mjs"
   },
   "dependencies": {
     "@azure/msal-node": "^7.1.1",

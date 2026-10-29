@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#07111a" />
+    <meta
+      name="description"
+      content="PISANTECH Workstation: escritorio de la suite PISANTECH con autenticación Microsoft Entra ID, presencia, Planner y bóveda de credenciales."
+    />
+    <title>PISANTECH Workstation</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #07111a;
+        --panel: #0d1b27;
+        --panel-2: #112434;
+        --line: #1e3a4f;
+        --text: #e8f2f8;
+        --muted: #8fa8b8;
+        --brand: #38d6c4;
+        --brand-2: #1b9aaa;
+        --warn: #f4c96b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 15% 0%, rgba(56, 214, 196, 0.16), transparent 32rem),
+          radial-gradient(circle at 90% 10%, rgba(27, 154, 170, 0.12), transparent 28rem),
+          var(--bg);
+        font-family:
+          "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        line-height: 1.6;
+      }
+
+      a {
+        color: var(--brand);
+      }
+
+      .shell {
+        width: min(1080px, calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 28px 0;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        font-size: 0.9rem;
+      }
+
+      .mark {
+        display: grid;
+        place-items: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        color: #041014;
+        background: linear-gradient(135deg, var(--brand), #8af0e3);
+        font-weight: 900;
+        letter-spacing: -0.04em;
+      }
+
+      nav {
+        display: flex;
+        gap: 18px;
+        font-size: 0.9rem;
+      }
+
+      nav a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+
+      nav a:hover {
+        color: var(--text);
+      }
+
+      main {
+        padding: 56px 0 40px;
+      }
+
+      .hero {
+        max-width: 820px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 18px;
+        padding: 6px 12px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--brand);
+        background: rgba(56, 214, 196, 0.06);
+        font-size: 0.77rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--brand);
+        box-shadow: 0 0 14px var(--brand);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.6rem, 7vw, 5.1rem);
+        line-height: 1.02;
+        letter-spacing: -0.055em;
+      }
+
+      h1 span {
+        color: var(--brand);
+      }
+
+      .lead {
+        max-width: 680px;
+        margin: 24px 0 32px;
+        color: var(--muted);
+        font-size: clamp(1.05rem, 2vw, 1.3rem);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        padding: 0 22px;
+        border-radius: 12px;
+        border: 1px solid transparent;
+        text-decoration: none;
+        font-weight: 700;
+        transition:
+          transform 160ms ease,
+          border-color 160ms ease,
+          background 160ms ease;
+      }
+
+      .button:hover {
+        transform: translateY(-1px);
+      }
+
+      .button-primary {
+        color: #041014;
+        background: linear-gradient(135deg, var(--brand), #8af0e3);
+        box-shadow: 0 12px 32px rgba(56, 214, 196, 0.18);
+      }
+
+      .button-secondary {
+        color: var(--text);
+        border-color: var(--line);
+        background: rgba(13, 27, 39, 0.72);
+      }
+
+      .button-secondary:hover {
+        border-color: #2d5a73;
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 18px;
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 64px;
+      }
+
+      .card {
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(17, 36, 52, 0.72), rgba(13, 27, 39, 0.72));
+      }
+
+      .card h2 {
+        margin: 0 0 8px;
+        font-size: 1rem;
+        letter-spacing: -0.01em;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .icon {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        margin-bottom: 14px;
+        border-radius: 10px;
+        color: var(--brand);
+        background: rgba(56, 214, 196, 0.09);
+        font-size: 1.05rem;
+      }
+
+      .notice {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 14px;
+        align-items: start;
+        margin-top: 28px;
+        padding: 18px 20px;
+        border: 1px solid rgba(244, 201, 107, 0.28);
+        border-radius: 14px;
+        background: rgba(244, 201, 107, 0.06);
+        color: #d9e5ec;
+        font-size: 0.92rem;
+      }
+
+      .notice strong {
+        color: var(--warn);
+      }
+
+      footer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 28px 0 40px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.83rem;
+      }
+
+      footer a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        color: var(--text);
+      }
+
+      @media (max-width: 760px) {
+        .grid {
+          grid-template-columns: 1fr;
+          margin-top: 44px;
+        }
+
+        nav {
+          display: none;
+        }
+
+        main {
+          padding-top: 32px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <a class="brand" href="https://github.com/Atdiel/pisan-workstation">
+          <span class="mark">P</span>
+          PISANTECH
+        </a>
+        <nav aria-label="Navegación principal">
+          <a href="#caracteristicas">Características</a>
+          <a href="#requisitos">Requisitos</a>
+          <a href="https://github.com/Atdiel/pisan-workstation/releases">Releases</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div class="eyebrow"><span class="dot"></span> Suite de escritorio</div>
+          <h1>PISANTECH <span>Workstation</span></h1>
+          <p class="lead">
+            Tu centro de trabajo en una sola aplicación: identidad corporativa,
+            presencia, Planner, bóveda de credenciales y control de sesiones por
+            dispositivo.
+          </p>
+
+          <div class="actions">
+            <a
+              class="button button-primary"
+              href="https://github.com/Atdiel/pisan-workstation/releases/latest"
+            >
+              Descargar para Windows
+            </a>
+            <a
+              class="button button-secondary"
+              href="https://github.com/Atdiel/pisan-workstation/blob/main/CHANGELOG.md"
+            >
+              Ver cambios
+            </a>
+          </div>
+
+          <div class="meta">
+            <span>Windows 10/11 · x64</span>
+            <span>Versión actual: <strong data-release-version>v0.1.0</strong></span>
+            <span>Requiere cuenta corporativa</span>
+          </div>
+        </section>
+
+        <section id="caracteristicas" class="grid" aria-label="Características">
+          <article class="card">
+            <div class="icon" aria-hidden="true">ID</div>
+            <h2>Entra ID</h2>
+            <p>
+              Inicio de sesión con Microsoft Entra ID. Los tokens se administran
+              en el proceso principal de Electron, nunca en el renderer.
+            </p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">●</div>
+            <h2>Presencia y Teams</h2>
+            <p>
+              Estado del equipo en tiempo real y sincronización del estado de
+              comida con Microsoft Teams.
+            </p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">✓</div>
+            <h2>Planner</h2>
+            <p>
+              Consulta y actualiza tus tareas de Microsoft Planner sin salir de
+              la estación de trabajo.
+            </p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">⌘</div>
+            <h2>Bóveda</h2>
+            <p>
+              Credenciales compartidas con bloqueo local y acceso controlado por
+              la sesión del dispositivo.
+            </p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">↻</div>
+            <h2>Sesiones</h2>
+            <p>
+              Una sesión por usuario y dispositivo, con validación en cada
+              petición HTTP y WebSocket.
+            </p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">↗</div>
+            <h2>Actualizaciones</h2>
+            <p>
+              Descarga la última versión publicada en GitHub Releases. Las notas
+              incluyen la versión de suite y de API.
+            </p>
+          </article>
+        </section>
+
+        <section id="requisitos">
+          <div class="notice">
+            <strong>Importante</strong>
+            <div>
+              Esta primera versión es para Windows 10/11 x64 y todavía no está
+              firmada. Windows puede mostrar SmartScreen; comprueba el archivo
+              <code>checksums.txt</code> publicado en el release antes de
+              instalar. Para despliegue corporativo, evalúa Intune o el portal de
+              aplicaciones de la empresa.
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <span>PISANTECH Workstation · Suite <span data-release-version>v0.1.0</span></span>
+        <span>
+          <a href="https://github.com/Atdiel/pisan-workstation">Repositorio</a>
+          ·
+          <a href="https://github.com/Atdiel/pisan-workstation/releases">Descargas</a>
+          ·
+          <a href="https://github.com/Atdiel/pisan-workstation/blob/main/CHANGELOG.md">Changelog</a>
+        </span>
+      </footer>
+    </div>
+
+    <script>
+      // Mantiene la versión visible sincronizada con el último release público.
+      fetch("https://api.github.com/repos/Atdiel/pisan-workstation/releases/latest", {
+        headers: { Accept: "application/vnd.github+json" },
+      })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((release) => {
+          if (!release || !release.tag_name) return;
+          document.querySelectorAll("[data-release-version]").forEach((node) => {
+            node.textContent = release.tag_name;
+          });
+        })
+        .catch(() => {
+          // Sin red o sin release público: se conserva la versión de respaldo.
+        });
+    </script>
+  </body>
+</html>

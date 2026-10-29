@@ -4,6 +4,20 @@ Escritorio de la **PISANTECH Suite**: Electron + React + TypeScript.
 Incluye autenticación con Microsoft Entra ID, directorio, presencia, Planner,
 bóveda de credenciales, perfil y gestión de sesiones por dispositivo.
 
+## Descarga e instalación
+
+Los instaladores se publican en
+[GitHub Releases](https://github.com/Atdiel/pisan-workstation/releases). La
+primera etapa está disponible para **Windows 10/11 x64**.
+
+El instalador aún no está firmado, por lo que Windows puede mostrar SmartScreen.
+Antes de instalar, compara el archivo con el `checksums.txt` publicado en el
+release. Si el repositorio es privado, los assets del release también requieren
+acceso al repositorio.
+
+Para despliegue corporativo en equipos administrados, evalúa Intune o el portal
+de aplicaciones de la empresa en lugar de la descarga manual.
+
 ## Requisitos
 
 - Node.js 22–24
@@ -34,14 +48,47 @@ npx tsc --noEmit
 npx vite build
 ```
 
-El empaquetado completo (`.exe`, `.dmg`, `.AppImage`) se genera con:
+El empaquetado se separa en dos pasos para que el CI pueda reutilizarlos:
 
 ```bash
-VITE_API_URL=https://tu-servicio.onrender.com npm run build
+npm run build:renderer
+npm run package:win
 ```
 
 Los artefactos quedan en `release/<version>/`. La versión del instalador y de
 `app.getVersion()` sale del campo `version` de `package.json`.
+
+## CI y releases
+
+- `CI` corre en `push` y `pull_request` hacia `main` y `development`.
+- La variable de repositorio `VITE_API_URL` define el backend que se incrusta en
+  el build. Si no existe, se usa `https://pisan-backend.onrender.com` como
+  respaldo.
+- Un tag `vX.Y.Z` dispara `release-desktop.yml`.
+- El workflow valida que el tag coincida con `package.json`, ejecuta lint,
+  typecheck, compila el renderer, genera el instalador de Windows y crea un
+  **draft release** en GitHub Releases con el `.exe` y `checksums.txt`.
+- El draft se revisa y se publica manualmente. En una etapa posterior se pueden
+  agregar macOS/Linux, firma de código y auto-update.
+
+El primer release se publica desde un tag creado sobre `main`:
+
+```bash
+npm run release:tag-check -- v0.1.0
+git tag -a v0.1.0 -m "PISANTECH Suite v0.1.0"
+git push origin v0.1.0
+```
+
+## Landing
+
+La página estática de descargas está en [`docs/index.html`](docs/index.html). El
+workflow `pages.yml` la publica en GitHub Pages cuando cambia `docs/` en `main`.
+
+Para habilitarla:
+
+1. Ve a `Settings → Pages`.
+2. Selecciona **GitHub Actions** como origen.
+3. Ejecuta el workflow `Deploy landing` o haz merge de un cambio en `docs/`.
 
 ## Versionado
 

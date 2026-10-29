@@ -110,9 +110,25 @@ git tag -a v0.2.0 -m "PISANTECH Suite v0.2.0"
 
 ### 3. Construir y desplegar
 
+El escritorio se construye en GitHub Actions al empujar el tag:
+
 ```bash
-# Escritorio, desde el tag
-VITE_API_URL=https://tu-servicio.onrender.com npm run build
+git push origin v0.2.0
+```
+
+El workflow `release-desktop.yml` valida que el tag coincida con `package.json`,
+compila el renderer y genera el instalador de Windows. Al terminar crea un
+**draft release** con el `.exe` y `checksums.txt`.
+
+Revisa el draft, descarga el instalador y pruébalo en una máquina limpia antes de
+publicarlo.
+
+Construcción manual de respaldo:
+
+```bash
+# Escritorio
+VITE_API_URL=https://tu-servicio.onrender.com npm run build:renderer
+npm run package:win
 # Artefactos en release/0.2.0/
 
 # Backend
@@ -131,10 +147,13 @@ Debe responder `status: "ok"`, la `version` esperada y `apiVersion: "v1"`.
 ### 4. Publicar
 
 - Empuja `main` y el tag en ambos repositorios: `git push origin main --tags`.
+- Publica el draft release del escritorio después de probar el instalador.
 - En las notas del release incluye los commits de backend y escritorio, la
   versión de API y cualquier migración o variable de entorno nueva.
 - Si el release cambia la API, indica qué versiones de escritorio siguen siendo
   compatibles.
+- Adjunta `checksums.txt` y conserva los instaladores anteriores para permitir
+  rollback a una versión estable.
 
 ## Hotfix
 
