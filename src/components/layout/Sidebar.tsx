@@ -33,7 +33,7 @@ export default function Sidebar({
       <div className="space-y-6">
         {/* Logo y Encabezado PISANTECH */}
         <div className="flex items-center gap-3 px-2 pt-2">
-          <div className="h-9 w-9 rounded-xl bg-white flex items-center justify-center font-bold text-slate-900 text-xl shadow-lg shadow-brand-teal/20">
+          <div className="h-9 w-9 rounded-xl bg-white flex items-center justify-center font-bold text-brand-navy text-xl shadow-lg shadow-brand-teal/20">
             <img
               src={logoPisantech}
               alt="PISANTECH Logo"
@@ -41,7 +41,7 @@ export default function Sidebar({
             />
           </div>
           <div>
-            <h3 className="font-bold text-white tracking-wide text-lg leading-none">
+            <h3 className="font-bold text-slate-100 tracking-wide text-lg leading-none">
               PISANTECH
             </h3>
             <span className="text-[10px] text-brand-teal font-semibold tracking-wider uppercase">
@@ -151,11 +151,11 @@ export default function Sidebar({
 
       {/* Footer Sidebar (Sesión segura y Ajustes) */}
       <div className="space-y-3 pt-4 border-t border-dark-border">
-        <div className="bg-emerald-950/40 border border-emerald-500/20 rounded-lg p-3 flex items-center gap-2.5 text-emerald-400 text-xs">
+        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3 flex items-center gap-2.5 text-emerald-400 text-xs">
           <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
           <div>
             <p className="font-semibold leading-tight">Sesión Cifrada</p>
-            <p className="text-[10px] text-emerald-500/80">
+            <p className="text-[10px] text-emerald-400">
               Conexión local segura
             </p>
           </div>
@@ -175,7 +175,11 @@ export default function Sidebar({
 
         <button
           onClick={() => setActiveTab("settings")}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-dark-card/40 transition-colors"
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+            activeTab === "settings"
+              ? "bg-brand-teal/15 text-brand-teal font-semibold"
+              : "text-slate-400 hover:text-slate-200 hover:bg-dark-card/40"
+          }`}
         >
           <Settings className="w-4 h-4" />
           Ajustes

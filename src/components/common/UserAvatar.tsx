@@ -44,7 +44,7 @@ export default function UserAvatar({
   if (failed) {
     return (
       <div
-        className={`${base} flex items-center justify-center text-[0.7em] font-bold text-brand-teal ${className}`}
+        className={`${base} flex items-center justify-center text-[0.7em] font-bold text-brand-teal-light ${className}`}
         title={title ?? name}
         aria-label={`Avatar de ${name}`}
       >

@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { LogIn } from "lucide-react";
 // componentes
 import Sidebar from "./components/layout/Sidebar";
 import Header from "./components/layout/Header";
+import { UpdateFooter } from "./components/layout/UpdateFooter";
+import { ConfirmActionDialog } from "./components/common/ConfirmActionDialog";
 
 // views
 import LoginView from "./views/login/LoginView";
@@ -10,6 +13,7 @@ import StatusView from "./views/status/StatusView";
 import VaultView from "./views/vault/VaultView";
 import AdminView from "./views/admin/AdminView";
 import ProfileView from "./views/profile/ProfileView";
+import SettingsView from "./views/settings/SettingsView";
 
 //types
 import type { PresenceStatus, UserStatusType } from "./types/status";
@@ -18,14 +22,23 @@ import type { PresenceStatus, UserStatusType } from "./types/status";
 import { useAuth } from "./hooks/useAuth";
 import { useNow } from "./hooks/useNow";
 import { usePresence } from "./hooks/usePresence";
+import { useNotificationSettings } from "./hooks/useNotificationSettings";
+import { useTeamNotifications } from "./hooks/useTeamNotifications";
+import { useLunchReminder } from "./hooks/useLunchReminder";
+import { useUpdates } from "./hooks/useUpdates";
 import { clearMasterKey } from "./services/masterKey.service";
+import {
+  getInitialView,
+  getRememberLastView,
+  saveLastView,
+} from "./services/preferences.service";
 import { getZonedClock, parseTimeToMinutes } from "./utils/workTime";
 
 const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : String(error);
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState<string>(() => getInitialView());
   const {
     authenticated,
     initializing,
@@ -36,12 +49,34 @@ export default function App() {
     logout,
     refresh,
   } = useAuth();
+  const notificationSettings = useNotificationSettings();
+  const updates = useUpdates();
   const presence = usePresence(authenticated);
   const now = useNow();
   const refreshPresence = presence.refresh;
   const [appVersion, setAppVersion] = useState<string | null>(null);
+  const [lunchDialogOpen, setLunchDialogOpen] = useState(false);
 
-  // La versión instalada la conoce Electron; no se escribe a mano en la UI.
+  useTeamNotifications({
+    change: presence.lastStatusChange,
+    currentUserId: user?.id,
+    settings: notificationSettings.settings,
+    activeTab,
+    timeZone: presence.workSchedule.timezone,
+  });
+
+  // Al hacer clic en un toast nativo, main restaura la ventana y nos dice a
+  // qué sección navegar.
+  useEffect(() => {
+    const api = window.pisan?.notifications;
+    if (!api) return;
+
+    return api.onNavigate((view) => {
+      setActiveTab(view);
+    });
+  }, []);
+
+  // La versión instalada la conoce Electron.
   useEffect(() => {
     let cancelled = false;
     const device = window.pisan?.device;
@@ -135,14 +170,43 @@ export default function App() {
   }, [authenticated, entryStatus, entryLunchUntil, syncTeams]);
 
   // Si el usuario deja de ser admin, la vista privilegiada no debe quedar
-  // abierta aunque el menú se haya renderizado antes del cambio.
+  // abierta aunque el menú se haya renderizado antes del cambio. Se espera a
+  // que la sesión y el usuario estén cargados para no perder una vista guardada.
   useEffect(() => {
-    if (activeTab === "admin" && !user?.isAdmin) {
+    if (initializing || !authenticated || !user) return;
+
+    if (activeTab === "admin" && !user.isAdmin) {
       setActiveTab("dashboard");
     }
-  }, [activeTab, user?.isAdmin]);
+  }, [activeTab, authenticated, initializing, user]);
+
+  // Guarda la última vista real cuando la preferencia está activa. Las vistas
+  // placeholder (Planner/Feed) no se guardan porque todavía no tienen pantalla.
+  useEffect(() => {
+    if (initializing || !authenticated || !user) return;
+    if (activeTab === "admin" && !user.isAdmin) return;
+    if (!getRememberLastView()) return;
+
+    saveLastView(activeTab);
+  }, [activeTab, authenticated, initializing, user]);
+
+  // Si no se recuerda la última vista, cerrar sesión regresa al inicio para
+  // que el siguiente acceso no reutilice la sección anterior.
+  useEffect(() => {
+    if (initializing || authenticated) return;
+    if (!getRememberLastView()) setActiveTab("dashboard");
+  }, [authenticated, initializing]);
 
   const workClock = getZonedClock(now, presence.workSchedule.timezone);
+  useLunchReminder({
+    authenticated,
+    ready: Boolean(myEntry),
+    settings: notificationSettings.settings,
+    schedule: presence.workSchedule,
+    dateKey: workClock.dateKey,
+    status: myStatus,
+    lastLunchDate: myEntry?.lastLunchDate ?? null,
+  });
   const lunchStart = presence.workSchedule.lunchStart ?? "14:00";
   const lunchStartMinutes = parseTimeToMinutes(lunchStart);
   const lunchTakenToday = myEntry?.lastLunchDate === workClock.dateKey;
@@ -160,15 +224,44 @@ export default function App() {
         ? `La comida inicia a las ${lunchStart}`
         : null;
 
-  const handleStatusChange = (status: UserStatusType) => {
-    if (status === myStatus) return;
-    if (status === "IN_LUNCH" && !canStartLunch) return;
+  const requestLunch = () => {
+    if (myStatus === "IN_LUNCH" || !canStartLunch) return;
+    setLunchDialogOpen(true);
+  };
 
-    void presence
-      .updateStatus(status, status === "IN_LUNCH" ? "Comida" : undefined)
-      .catch((err: unknown) => {
-        console.error("No se pudo cambiar el estado:", err);
-      });
+  const startLunch = async () => {
+    if (!canStartLunch) return;
+
+    try {
+      await presence.updateStatus("IN_LUNCH", "Comida");
+    } catch (err: unknown) {
+      alert(
+        err instanceof Error
+          ? err.message
+          : "No se pudo iniciar la pausa de comida.",
+      );
+    }
+  };
+
+  // Si la comida se inicia desde otro dispositivo, el modal abierto en el
+  // header o en la pestaña de comida se cierra para mantener ambos sincronizados.
+  useEffect(() => {
+    if (!authenticated || myStatus === "IN_LUNCH") {
+      setLunchDialogOpen(false);
+    }
+  }, [authenticated, myStatus]);
+
+  const handleStatusChange = (status: UserStatusType) => {
+    if (status === "IN_LUNCH") {
+      requestLunch();
+      return;
+    }
+
+    if (status === myStatus) return;
+
+    void presence.updateStatus(status).catch((err: unknown) => {
+      console.error("No se pudo cambiar el estado:", err);
+    });
   };
 
   if (initializing) {
@@ -223,13 +316,13 @@ export default function App() {
               presence={presence}
               canStartLunch={canStartLunch}
               lunchBlockReason={lunchBlockReason}
+              onRequestLunch={requestLunch}
               teamsError={teamsError}
               onRetryTeams={() => syncTeams(myStatus, entryLunchUntil ?? null)}
             />
           )}
           {activeTab === "vault" && (
             <VaultView
-              currentUser={user}
               onMasterKeyRecovery={async () => {
                 clearMasterKey();
                 await logout();
@@ -242,6 +335,27 @@ export default function App() {
               onSaved={async () => {
                 await refresh();
               }}
+            />
+          )}
+          {activeTab === "settings" && (
+            <SettingsView
+              appVersion={appVersion}
+              currentView={activeTab}
+              notificationSettings={notificationSettings.settings}
+              notificationSettingsLoading={notificationSettings.loading}
+              notificationSettingsError={notificationSettings.error}
+              notificationsSupported={notificationSettings.supported}
+              onNotificationSettingChange={notificationSettings.setSetting}
+              onResetNotifications={notificationSettings.reset}
+              updateState={updates.state}
+              updatesLoading={updates.loading}
+              updatesError={updates.error}
+              onCheckForUpdates={updates.check}
+              onDownloadUpdate={updates.download}
+              onInstallUpdate={updates.install}
+              onAutoUpdatesChange={updates.setAutoCheck}
+              onLogout={logout}
+              onOpenVault={() => setActiveTab("vault")}
             />
           )}
           {activeTab === "admin" && user?.isAdmin && (
@@ -263,11 +377,34 @@ export default function App() {
             {/* <span className="w-2 h-2 rounded-full bg-brand-teal animate-pulse" />
             Sistema en línea */}
           </div>
-          <div>
-            PISANTECH Suite{appVersion ? ` v${appVersion}` : ""}
+          <div className="flex items-center gap-3">
+            <UpdateFooter
+              state={updates.state}
+              onDownload={() => void updates.download()}
+              onInstall={() => void updates.install()}
+            />
+            <span>
+              PISANTECH Suite{appVersion ? ` v${appVersion}` : ""}
+            </span>
           </div>
         </footer>
       </div>
+
+      {/* Confirmación compartida entre el header y la pestaña de comida */}
+      {lunchDialogOpen && (
+        <ConfirmActionDialog
+          icon={LogIn}
+          tone="teal"
+          title="Ir a comer"
+          message="El contador arrancará en 01:00:00 y tu estado cambiará a «En comida» para el resto del equipo. ¿Deseas iniciar la pausa?"
+          confirmLabel="Iniciar comida"
+          onConfirm={() => {
+            setLunchDialogOpen(false);
+            void startLunch();
+          }}
+          onCancel={() => setLunchDialogOpen(false)}
+        />
+      )}
     </div>
   );
 }

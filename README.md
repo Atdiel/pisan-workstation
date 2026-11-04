@@ -67,9 +67,12 @@ Los artefactos quedan en `release/<version>/`. La versión del instalador y de
 - Un tag `vX.Y.Z` dispara `release-desktop.yml`.
 - El workflow valida que el tag coincida con `package.json`, ejecuta lint,
   typecheck, compila el renderer, genera el instalador de Windows y crea un
-  **draft release** en GitHub Releases con el `.exe` y `checksums.txt`.
-- El draft se revisa y se publica manualmente. En una etapa posterior se pueden
-  agregar macOS/Linux, firma de código y auto-update.
+  **draft release** en GitHub Releases con el `.exe`, `checksums.txt`,
+  `latest.yml` y `.blockmap`.
+- El draft se revisa y se publica manualmente. Incluye el `.exe`, `checksums.txt`,
+  `latest.yml` y el `.blockmap`, que son los metadatos que usa el cliente de
+  actualizaciones. En una etapa posterior se pueden agregar macOS/Linux y firma
+  de código.
 
 El primer release se publica desde un tag creado sobre `main`:
 
@@ -78,6 +81,20 @@ npm run release:tag-check -- v0.1.0
 git tag -a v0.1.0 -m "PISANTECH Suite v0.1.0"
 git push origin v0.1.0
 ```
+
+## Actualizaciones
+
+La app comprueba actualizaciones automáticamente todos los días a las 9:00
+(hora local) y también desde **Ajustes → Actualizaciones → Buscar
+actualizaciones**. Cuando hay una versión nueva, el footer muestra el aviso y
+permite descargarla; la instalación se confirma con **Reiniciar e instalar**.
+No se descarga ni se instala nada en segundo plano.
+
+El proceso main usa `electron-updater` y lee el `app-update.yml` que genera
+`electron-builder`. El provider de GitHub está configurado como draft y el
+workflow sube `latest.yml` y el `.blockmap` al release. Para pruebas con un
+servidor genérico se puede definir `PISAN_UPDATE_FEED_URL`. Si el repositorio es
+privado, el feed de GitHub necesita autenticación o un canal público alterno.
 
 ## Landing
 
@@ -89,6 +106,22 @@ Para habilitarla:
 1. Ve a `Settings → Pages`.
 2. Selecciona **GitHub Actions** como origen.
 3. Ejecuta el workflow `Deploy landing` o haz merge de un cambio en `docs/`.
+
+## Iconos de escritorio
+
+El icono de la app y del instalador se genera desde
+[`src/assets/brand/logoPisantech.svg`](src/assets/brand/logoPisantech.svg):
+
+```bash
+npm run icons:generate
+```
+
+El comando actualiza:
+
+- `build/icon.ico`: Windows.
+- `build/icon.icns`: macOS.
+- `build/icons/`: set de PNG para Linux.
+- `build/icon.png` y `public/icon.png`: ventana de Electron y favicon del renderer.
 
 ## Versionado
 

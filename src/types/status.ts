@@ -43,6 +43,13 @@ export interface StatusSnapshot {
   entries: UserStatusEntry[];
 }
 
+/** Cambio puntual recibido por WebSocket, no una foto completa. */
+export interface StatusChangeEvent {
+  id: number;
+  entry: UserStatusEntry;
+  previous: UserStatusEntry | undefined;
+}
+
 export type TeamMemberStatus =
   | "In lunch"
   | "Available"

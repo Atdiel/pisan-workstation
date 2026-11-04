@@ -7,17 +7,27 @@
   "directories": {
     "output": "release/${version}"
   },
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "Atdiel",
+      "repo": "pisan-workstation",
+      "releaseType": "draft"
+    }
+  ],
   "files": [
     "dist",
     "dist-electron"
   ],
   "mac": {
+    "icon": "build/icon.icns",
     "target": [
       "dmg"
     ],
     "artifactName": "PISANTECH-Workstation-Mac-${version}-Installer.${ext}"
   },
   "win": {
+    "icon": "build/icon.ico",
     "target": [
       {
         "target": "nsis",
@@ -35,6 +45,7 @@
     "deleteAppDataOnUninstall": false
   },
   "linux": {
+    "icon": "build/icons",
     "target": [
       "AppImage"
     ],

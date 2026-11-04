@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Definición de la paleta PISANTECH para Tailwind CSS v4 */
+/* Definición de la paleta para Tailwind CSS v4 */
 @theme {
   --color-brand-navy: #0F2240;
   --color-brand-teal: #00A896;
@@ -10,13 +10,131 @@
   --color-dark-sidebar: #0D131F;
   --color-dark-card: #131C2E;
   --color-dark-border: #1E2B45;
+
+  --color-slate-100: #F1F5F9;
+  --color-slate-200: #E2E8F0;
+  --color-slate-300: #CBD5E1;
+  --color-slate-400: #94A3B8;
+  --color-slate-500: #64748B;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1E293B;
+  --color-slate-900: #0F172A;
+  --color-slate-950: #020617;
+}
+
+/*
+ * Tema oscuro "Dark Forest".
+ * Al vivir en el mismo grupo de variables que @theme, Tailwind actualiza
+ * automáticamente todas las utilidades que usan estos colores.
+ */
+:root[data-theme="dark forest"] {
+  --color-brand-navy: #0A1923;
+  --color-brand-teal: #3FE4CD;
+  --color-brand-teal-light: #21BFA9;
+
+  --color-dark-bg: #050F17;
+  --color-dark-sidebar: #0A1923;
+  --color-dark-card: #0C1E29;
+  --color-dark-border: #16313C;
+
+  --color-slate-100: #E6F1F4;
+  --color-slate-200: #D9E7EB;
+  --color-slate-300: #C6D7DC;
+  --color-slate-400: #8AA4AE;
+  --color-slate-500: #627D87;
+  --color-slate-600: #4B6670;
+  --color-slate-700: #20404C;
+  --color-slate-800: #102833;
+  --color-slate-900: #0A1923;
+  --color-slate-950: #030A10;
+}
+
+/*
+ * Tema claro "Moon Light".
+ * Tonos de texto invertidos para conservar contraste sobre superficies claras.
+ */
+:root[data-theme="moonlight"] {
+  color-scheme: light;
+
+  --color-brand-navy: #314F6F;
+  --color-brand-teal: #01AAAA;
+  --color-brand-teal-light: #6ECECE;
+
+  --color-dark-bg: #EEF2F6;        /* fondo general */
+  --color-dark-sidebar: #E4EAF1;   /* sidebar */
+  --color-dark-card: #F8FAFC;      /* tarjetas */
+  --color-dark-border: #D3DCE6;    /* bordes */
+
+  /* Escala slate invertida: lo que era texto claro ahora es texto oscuro */
+  --color-slate-100: #0F172A;
+  --color-slate-200: #1E293B;
+  --color-slate-300: #334155;
+  --color-slate-400: #475569;
+  --color-slate-500: #64748B;      /* se mantiene como punto medio */
+  --color-slate-600: #94A3B8;
+  --color-slate-700: #CBD5E1;
+  --color-slate-800: #E2E8F0;
+  --color-slate-900: #F1F5F9;
+  --color-slate-950: #F8FAFC;
+}
+
+/*
+ * El turquesa de marca es brillante para fondos; en texto usamos un tono
+ * más profundo para mantener legibilidad sobre superficies claras.
+ */
+:root[data-theme="moonlight"] .text-brand-teal {
+  color: #008577;
+}
+
+:root[data-theme="moonlight"] :is(.text-emerald-300, .text-emerald-400) {
+  color: #028787;
+}
+
+:root[data-theme="moonlight"] :is(.bg-emerald-400) {
+  background-color: #01AAAA;
+}
+:root[data-theme="moonlight"] :is(.bg-emerald-500\/10) {
+  background-color: #b1e7e7;
+}
+
+:root[data-theme="moonlight"] :is(.text-amber-200, .text-amber-300, .text-amber-400) {
+  color: #D98E2B;
+}
+
+:root[data-theme="moonlight"] :is(.text-rose-300, .text-rose-400) {
+  color: #BE123C;
+}
+
+:root[data-theme="moonlight"] :is(.text-indigo-300, .text-indigo-400) {
+  color: #4338CA;
+}
+
+:root[data-theme="moonlight"] .text-indigo-600 {
+  color: #3730A3;
+}
+
+:root[data-theme="moonlight"] .text-sky-400 {
+  color: #0369A1;
+}
+
+:root[data-theme="moonlight"] .text-blue-400 {
+  color: #1D4ED8;
+}
+
+:root[data-theme="moonlight"] .text-purple-400 {
+  color: #7E22CE;
+}
+
+:root[data-theme="moonlight"] .text-lime-400 {
+  color: #4D7C0F;
 }
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   color-scheme: dark;
   background-color: var(--color-dark-bg);
-  color: #F8FAFC;
+  color: var(--color-slate-100);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

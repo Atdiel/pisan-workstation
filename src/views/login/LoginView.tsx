@@ -21,10 +21,10 @@ export default function LoginView({
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#0b0f17] flex flex-col items-center justify-between p-6 text-slate-100 font-sans selection:bg-brand-teal selection:text-slate-950">
+    <div className="min-h-screen w-full bg-dark-bg flex flex-col items-center justify-between p-6 text-slate-100 font-sans selection:bg-brand-teal selection:text-slate-950">
       {/* Contenedor central de la tarjeta */}
       <div className="my-auto w-full max-w-md">
-        <div className="bg-[#111927] border border-dark-border/80 rounded-2xl p-8 shadow-2xl shadow-black/50 space-y-8 relative overflow-hidden backdrop-blur-sm">
+        <div className="bg-dark-card border border-dark-border/80 rounded-2xl p-8 shadow-2xl shadow-brand-navy/20 space-y-8 relative overflow-hidden backdrop-blur-sm">
           {/* Brillo sutil de fondo en la tarjeta */}
           <div className="absolute -top-24 -left-24 w-48 h-48 bg-brand-teal/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -35,7 +35,7 @@ export default function LoginView({
                 <img src={logoPisantech} alt="Logo PISANTECH" className="w-full h-full object-contain" />
               </div>
               <div className="flex items-baseline gap-1.5">
-                <span className="font-bold text-white tracking-tight text-lg">
+                <span className="font-bold text-slate-100 tracking-tight text-lg">
                   PISANTECH
                 </span>
                 <span className="text-slate-400 font-normal text-base">
@@ -45,7 +45,7 @@ export default function LoginView({
             </div>
 
             <div className="space-y-2">
-              <h1 className="text-2xl font-bold text-white tracking-tight">
+              <h1 className="text-2xl font-bold text-slate-100 tracking-tight">
                 Bienvenido
               </h1>
               <p className="text-xs text-slate-400 leading-relaxed">
@@ -61,7 +61,7 @@ export default function LoginView({
               type="button"
               onClick={handleLogin}
               disabled={loading}
-              className="w-full group relative flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl bg-slate-900/90 border border-brand-teal/40 hover:border-brand-teal text-white text-xs font-semibold hover:bg-brand-teal/10 transition-all duration-200 shadow-lg shadow-black/20 focus:outline-none focus:ring-2 focus:ring-brand-teal/50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full group relative flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl bg-brand-navy border border-brand-teal/40 hover:border-brand-teal text-white text-xs font-semibold hover:bg-brand-navy/90 transition-all duration-200 shadow-lg shadow-brand-navy/20 focus:outline-none focus:ring-2 focus:ring-brand-teal/50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {/* Icono vectorial oficial de Microsoft (4 cuadros) */}
               <svg

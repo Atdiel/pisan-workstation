@@ -118,10 +118,16 @@ git push origin v0.2.0
 
 El workflow `release-desktop.yml` valida que el tag coincida con `package.json`,
 compila el renderer y genera el instalador de Windows. Al terminar crea un
-**draft release** con el `.exe` y `checksums.txt`.
+**draft release** con el `.exe`, `checksums.txt`, `latest.yml` y `.blockmap`.
 
 Revisa el draft, descarga el instalador y pruébalo en una máquina limpia antes de
 publicarlo.
+
+El cliente de actualizaciones ya está integrado y busca una vez al día a las
+9:00 locales. El provider de GitHub está configurado como draft y el workflow
+sube `latest.yml` y el `.blockmap` junto al instalador. Antes de publicar el
+draft, confirma que incluya el `.exe`, `checksums.txt`, `latest.yml` y el
+`.blockmap`; el release sigue siendo manual.
 
 Construcción manual de respaldo:
 

@@ -245,7 +245,7 @@ export default function ProfileView({ user, onSaved }: Props) {
     <div className="space-y-6 text-slate-100 p-6 max-w-7xl mx-auto">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-100">
             Mi perfil
           </h1>
           <p className="text-xs text-slate-400 mt-1">
@@ -269,7 +269,7 @@ export default function ProfileView({ user, onSaved }: Props) {
               className="h-24 w-24 border-4 border-dark-card shadow-xl shadow-black/30"
               showBorder={false}
             />
-            <h2 className="mt-3 text-lg font-bold text-white">{user.name}</h2>
+            <h2 className="mt-3 text-lg font-bold text-slate-100">{user.name}</h2>
             <p className="text-xs text-slate-400">{user.email}</p>
 
             <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
@@ -304,7 +304,7 @@ export default function ProfileView({ user, onSaved }: Props) {
         <section className="rounded-2xl border border-dark-border bg-dark-card">
           <div className="flex flex-col gap-3 border-b border-dark-border p-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="flex items-center gap-2 text-sm font-semibold text-white">
+              <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-100">
                 <Palette className="h-4 w-4 text-brand-teal" />
                 Diseña tu avatar
               </h2>
@@ -488,7 +488,7 @@ export default function ProfileView({ user, onSaved }: Props) {
       <section className="rounded-2xl border border-dark-border bg-dark-card">
         <div className="flex flex-col gap-3 border-b border-dark-border p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="flex items-center gap-2 text-sm font-semibold text-white">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-100">
               <ShieldCheck className="h-4 w-4 text-brand-teal" />
               Sesiones y dispositivos
             </h2>

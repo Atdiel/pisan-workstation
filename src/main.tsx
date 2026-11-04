@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App.tsx'
 import './index.css'
+import { applyTheme, getStoredTheme } from './theme/theme'
+
+// Se aplica antes del primer render para evitar un destello del tema anterior.
+applyTheme(getStoredTheme())
 
 const queryClient = new QueryClient({
   defaultOptions: {

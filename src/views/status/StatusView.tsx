@@ -10,7 +10,7 @@ import type {
 } from "../../types/status";
 import { roleLabel } from "../../utils/roles";
 import UserAvatar from "../../components/common/UserAvatar";
-import { ConfirmActionDialog } from "./components/ConfirmActionDialog";
+import { ConfirmActionDialog } from "../../components/common/ConfirmActionDialog";
 import {
   Utensils,
   Square,
@@ -29,6 +29,7 @@ interface Props {
   presence: PresenceApi;
   canStartLunch: boolean;
   lunchBlockReason: string | null;
+  onRequestLunch: () => void;
   teamsError: string | null;
   onRetryTeams: () => void;
 }
@@ -83,11 +84,12 @@ export default function StatusView({
   presence,
   canStartLunch,
   lunchBlockReason,
+  onRequestLunch,
   teamsError,
   onRetryTeams,
 }: Props) {
   const users = useUsers();
-  const [dialog, setDialog] = useState<"lunch" | "finish" | null>(null);
+  const [dialog, setDialog] = useState<"finish" | null>(null);
   const autoEnded = useRef(false);
 
   const myEntry = currentUser
@@ -143,20 +145,6 @@ export default function StatusView({
       ? formatHour(lunchUntil)
       : null;
 
-  const startLunch = async () => {
-    if (!canStartLunch) return;
-
-    try {
-      await presence.updateStatus("IN_LUNCH", "Comida");
-    } catch (err) {
-      alert(
-        err instanceof Error
-          ? err.message
-          : "No se pudo iniciar la pausa de comida.",
-      );
-    }
-  };
-
   const endLunch = async () => {
     try {
       await presence.updateStatus("AVAILABLE");
@@ -205,7 +193,7 @@ export default function StatusView({
       {/* Encabezado y Acciones */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-100">
             Estado de Trabajo y Temporizador de Comida
           </h1>
           <p className="text-xs text-slate-400 mt-1">
@@ -232,7 +220,7 @@ export default function StatusView({
           <div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <h2 className="text-lg font-semibold text-white">
+                <h2 className="text-lg font-semibold text-slate-100">
                   {isInLunch
                     ? "Pausa para comer en progreso"
                     : "Pausa para comer"}
@@ -285,7 +273,7 @@ export default function StatusView({
                   />
                 </svg>
                 <div className="absolute text-center">
-                  <p className="text-2xl font-bold font-mono tracking-tight text-white">
+                  <p className="text-2xl font-bold font-mono tracking-tight text-slate-100">
                     {formatTime(secondsLeft)}
                   </p>
                   <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mt-0.5">
@@ -334,7 +322,7 @@ export default function StatusView({
               <div className="flex items-center gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => setDialog("lunch")}
+                  onClick={onRequestLunch}
                   disabled={isInLunch || !canStartLunch}
                   title={
                     !canStartLunch
@@ -364,7 +352,7 @@ export default function StatusView({
         <div className="space-y-6 flex flex-col justify-between">
           {/* Card Resumen de Hoy */}
           <div className="bg-dark-card border border-dark-border rounded-xl p-5 space-y-4">
-            <h3 className="text-sm font-semibold text-white">Hoy</h3>
+            <h3 className="text-sm font-semibold text-slate-100">Hoy</h3>
             <div className="space-y-3 text-xs">
               <div className="flex items-center justify-between text-slate-300">
                 <span className="flex items-center gap-2 text-slate-400">
@@ -408,7 +396,7 @@ export default function StatusView({
           {/* Card Automatizaciones Inteligentes */}
           <div className="bg-dark-card border border-dark-border rounded-xl p-5 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-white">
+              <h3 className="text-sm font-semibold text-slate-100">
                 Automatizaciones
               </h3>
               <button className="text-[11px] text-brand-teal hover:underline font-medium flex items-center gap-1">
@@ -432,7 +420,7 @@ export default function StatusView({
       <div className="bg-dark-card border border-dark-border rounded-xl overflow-hidden">
         {/* Cabecera de la Tabla */}
         <div className="p-4 sm:p-5 border-b border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <h3 className="text-base font-semibold text-white">
+          <h3 className="text-base font-semibold text-slate-100">
             Matriz de disponibilidad del equipo
           </h3>
           <div className="flex items-center gap-2">
@@ -552,21 +540,7 @@ export default function StatusView({
         </div>
       </div>
 
-      {/* Confirmaciones de acción */}
-      {dialog === "lunch" && (
-        <ConfirmActionDialog
-          icon={LogIn}
-          tone="teal"
-          title="Ir a comer"
-          message="El contador arrancará en 01:00:00 y tu estado cambiará a «En comida» para el resto del equipo. ¿Deseas iniciar la pausa?"
-          confirmLabel="Iniciar comida"
-          onConfirm={() => {
-            setDialog(null);
-            void startLunch();
-          }}
-          onCancel={() => setDialog(null)}
-        />
-      )}
+      {/* Confirmación para finalizar la comida */}
       {dialog === "finish" && (
         <ConfirmActionDialog
           icon={Square}

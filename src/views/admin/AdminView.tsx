@@ -153,7 +153,7 @@ export default function AdminView({
     <div className="space-y-6 text-slate-100 p-6 max-w-7xl mx-auto">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-100">
             Administración de usuarios
           </h1>
           <p className="text-xs text-slate-400 mt-1">
@@ -181,7 +181,7 @@ export default function AdminView({
               Usuarios
             </span>
           </div>
-          <p className="mt-2 text-2xl font-bold text-white">{users.length}</p>
+          <p className="mt-2 text-2xl font-bold text-slate-100">{users.length}</p>
         </div>
 
         <div className="rounded-xl border border-dark-border bg-dark-card p-4">
@@ -191,7 +191,7 @@ export default function AdminView({
               Administradores
             </span>
           </div>
-          <p className="mt-2 text-2xl font-bold text-white">{adminCount}</p>
+          <p className="mt-2 text-2xl font-bold text-slate-100">{adminCount}</p>
         </div>
 
         <div className="rounded-xl border border-dark-border bg-dark-card p-4">
@@ -201,7 +201,7 @@ export default function AdminView({
               Vinculados a Entra
             </span>
           </div>
-          <p className="mt-2 text-2xl font-bold text-white">
+          <p className="mt-2 text-2xl font-bold text-slate-100">
             {users.filter((user) => user.linked).length}
           </p>
         </div>
