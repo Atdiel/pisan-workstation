@@ -1,11 +1,28 @@
-import { X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import {
+  Eye,
+  EyeOff,
+  Globe,
+  Lock,
+  Pencil,
+  RefreshCw,
+  Save,
+  ShieldCheck,
+  User,
+  X,
+} from "lucide-react";
 import { Credential, CredentialForm } from "../../../types/vault";
+import {
+  generateStrongPassword,
+  getPasswordStrength,
+  STRENGTH_SEGMENTS,
+} from "../password";
 
 interface Props {
   credential: Credential | null;
   form: CredentialForm;
   saving: boolean;
-  currentUserName: string;
   onChange: (form: CredentialForm) => void;
   onClose: () => void;
   onSubmit: (e: React.FormEvent) => void;
@@ -15,133 +32,292 @@ export function EditCredentialModal({
   credential,
   form,
   saving,
-  currentUserName,
   onChange,
   onClose,
   onSubmit,
 }: Props) {
+  const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    setShowPassword(false);
+  }, [credential?.id]);
+
   if (!credential) return null;
 
-  return (
+  const originalForm: CredentialForm = {
+    systemName: credential.systemName,
+    type: credential.type,
+    environment: credential.environment,
+    username: credential.username,
+    password: "",
+    url: credential.url ?? "",
+    notes: credential.notes ?? "",
+  };
+
+  const hasChanges = (
+    Object.keys(originalForm) as Array<keyof CredentialForm>
+  ).some((field) => form[field] !== originalForm[field]);
+
+  const strength = getPasswordStrength(form.password);
+
+  const handleGeneratePassword = () => {
+    onChange({ ...form, password: generateStrongPassword() });
+    setShowPassword(true);
+  };
+
+  const handleSubmit = (event: React.FormEvent) => {
+    if (!hasChanges || saving) {
+      event.preventDefault();
+      return;
+    }
+
+    onSubmit(event);
+  };
+
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-      <div className="bg-[#111927] border border-dark-border rounded-xl p-6 w-full max-w-md shadow-2xl relative space-y-5">
+      <div className="bg-dark-card border border-dark-border rounded-2xl w-full max-w-lg max-h-[90vh] shadow-2xl relative overflow-hidden flex flex-col text-slate-200">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1 rounded-lg text-slate-400 hover:text-white hover:bg-dark-card transition-colors"
+          className="absolute top-5 right-5 p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 transition-colors z-10"
+          aria-label="Cerrar"
         >
-          <X className="w-4 h-4" />
+          <X className="w-5 h-5" />
         </button>
 
-        <div className="space-y-1">
-          <h2 className="text-lg font-bold text-white">Editar credencial</h2>
+        <div className="shrink-0 px-6 pt-6 pb-4 pr-14 border-b border-dark-border/80 space-y-3">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 rounded-xl flex items-center justify-center">
+              <Pencil className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-slate-100 tracking-tight">
+                Editar credencial
+              </h2>
+              <p className="text-xs text-slate-400 font-medium">
+                Bóveda de contraseñas compartidas
+              </p>
+            </div>
+          </div>
+
           <p className="text-xs text-slate-400">
-            Modifica los campos y guarda para hacer PATCH /vault/:id
+            Actualiza los datos de acceso de esta credencial y guarda los cambios.
           </p>
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-semibold text-slate-300">
-              Sistema / Servicio
-            </label>
-            <input
-              value={form.systemName}
-              onChange={(e) => onChange({ ...form, systemName: e.target.value })}
-              className="w-full bg-dark-bg border border-dark-border text-xs text-white rounded-lg px-3 py-2.5 focus:outline-none focus:border-brand-teal"
-            />
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4 space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-300">
+                Sistema / nombre del servicio{" "}
+                <span className="text-indigo-400">*</span>
+              </label>
+              <input
+                required
+                value={form.systemName}
+                onChange={(e) => onChange({ ...form, systemName: e.target.value })}
+                placeholder="SAP S/4HANA — PRD"
+                className="w-full bg-dark-bg border border-dark-border text-sm text-slate-100 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 placeholder:text-slate-600 transition-all"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-300">
+                  Entorno <span className="text-indigo-400">*</span>
+                </label>
+                <select
+                  value={form.environment}
+                  onChange={(e) =>
+                    onChange({
+                      ...form,
+                      environment: e.target.value as CredentialForm["environment"],
+                    })
+                  }
+                  className="w-full bg-dark-bg border border-dark-border text-sm text-slate-100 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all appearance-none cursor-pointer"
+                >
+                  <option value="PRD">Productivo</option>
+                  <option value="QAS">Calidad</option>
+                  <option value="DEV">Desarrollo</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-300">
+                  Tipo de credencial <span className="text-indigo-400">*</span>
+                </label>
+                <select
+                  value={form.type}
+                  onChange={(e) =>
+                    onChange({
+                      ...form,
+                      type: e.target.value as CredentialForm["type"],
+                    })
+                  }
+                  className="w-full bg-dark-bg border border-dark-border text-sm text-slate-100 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all appearance-none cursor-pointer"
+                >
+                  <option value="SAP_LOGON">SAP Logon</option>
+                  <option value="VPN">VPN</option>
+                  <option value="WEB_SITE">Sitio Web</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-300">
+                Usuario / email <span className="text-indigo-400">*</span>
+              </label>
+              <div className="relative">
+                <User className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input
+                  required
+                  value={form.username}
+                  onChange={(e) => onChange({ ...form, username: e.target.value })}
+                  placeholder="mchen_admin"
+                  className="w-full bg-dark-bg border border-dark-border text-sm text-slate-100 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 placeholder:text-slate-600 transition-all font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-medium text-slate-300">
+                  Contraseña <span className="text-slate-500">· Opcional</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={handleGeneratePassword}
+                  className="text-xs font-medium text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  Generar contraseña
+                </button>
+              </div>
+              <div className="relative">
+                <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={form.password}
+                  onChange={(e) => onChange({ ...form, password: e.target.value })}
+                  placeholder="Dejar vacío para conservar la actual"
+                  className="w-full bg-dark-bg border border-dark-border text-sm text-slate-100 rounded-xl pl-10 pr-10 py-3 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 placeholder:text-slate-600 transition-all font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((visible) => !visible)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+
+              {form.password ? (
+                <div
+                  className="flex items-center gap-2 pt-1"
+                  role="progressbar"
+                  aria-label="Fortaleza de la contraseña"
+                  aria-valuemin={0}
+                  aria-valuemax={4}
+                  aria-valuenow={strength.score}
+                  aria-valuetext={strength.label}
+                >
+                  <div className="flex gap-1 flex-1">
+                    {STRENGTH_SEGMENTS.map((segment) => (
+                      <div
+                        key={segment}
+                        className={`h-1 flex-1 rounded-full transition-colors ${
+                          segment <= strength.score
+                            ? strength.barClass
+                            : "bg-slate-800"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span
+                    className={`text-xs font-medium ${strength.textClass}`}
+                    aria-live="polite"
+                  >
+                    {strength.label}
+                  </span>
+                </div>
+              ) : (
+                <p className="text-[11px] text-slate-500">
+                  Déjala vacía para conservar la contraseña actual.
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-300">
+                URL <span className="text-slate-500">· Opcional</span>
+              </label>
+              <div className="relative">
+                <Globe className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input
+                  value={form.url}
+                  onChange={(e) => onChange({ ...form, url: e.target.value })}
+                  placeholder="https://ejemplo.com/registro"
+                  className="w-full bg-dark-bg border border-dark-border text-sm text-slate-100 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 placeholder:text-slate-600 transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-300">
+                Notas <span className="text-slate-500">· Opcional</span>
+              </label>
+              <textarea
+                rows={3}
+                value={form.notes}
+                onChange={(e) => onChange({ ...form, notes: e.target.value })}
+                placeholder="Agrega instrucciones de acceso o detalles para tu equipo..."
+                className="w-full bg-dark-bg border border-dark-border text-sm text-slate-100 rounded-xl p-3 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 placeholder:text-slate-600 transition-all resize-none"
+              />
+            </div>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-semibold text-slate-300">
-              Tipo
-            </label>
-            <select
-              value={form.type}
-              onChange={(e) =>
-                onChange({
-                  ...form,
-                  type: e.target.value as CredentialForm["type"],
-                })
-              }
-              className="w-full bg-dark-bg border border-dark-border text-xs text-white rounded-lg px-3 py-2.5 focus:outline-none focus:border-brand-teal"
-            >
-              <option value="SAP_LOGON">SAP_LOGON</option>
-              <option value="VPN">VPN</option>
-              <option value="WEB_SITE">WEB_SITE</option>
-            </select>
-          </div>
+          <div className="shrink-0 border-t border-dark-border/80 bg-dark-card">
+            <div className="flex items-center gap-2 px-6 pt-4 text-xs text-slate-400">
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>
+                Encriptado con AES-256. Todos los accesos a las credenciales están
+                registrados y monitoreados.
+              </span>
+            </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-semibold text-slate-300">
-              Entorno
-            </label>
-            <select
-              value={form.environment}
-              onChange={(e) =>
-                onChange({
-                  ...form,
-                  environment: e.target.value as CredentialForm["environment"],
-                })
-              }
-              className="w-full bg-dark-bg border border-dark-border text-xs text-white rounded-lg px-3 py-2.5 focus:outline-none focus:border-brand-teal"
-            >
-              <option value="PRD">PRD</option>
-              <option value="QAS">QAS</option>
-              <option value="DEV">DEV</option>
-            </select>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-semibold text-slate-300">
-              Usuario
-            </label>
-            <input
-              value={form.username}
-              onChange={(e) => onChange({ ...form, username: e.target.value })}
-              className="w-full bg-dark-bg border border-dark-border text-xs text-white rounded-lg px-3 py-2.5 focus:outline-none focus:border-brand-teal"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-semibold text-slate-300">
-              Contraseña
-            </label>
-            <input
-              type="password"
-              value={form.password}
-              onChange={(e) => onChange({ ...form, password: e.target.value })}
-              placeholder="Dejar vacío para conservar la actual"
-              className="w-full bg-dark-bg border border-dark-border text-xs text-white rounded-lg px-3 py-2.5 focus:outline-none focus:border-brand-teal font-mono"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-semibold text-slate-300">
-              Actualizado por
-            </label>
-            <p className="w-full bg-dark-bg border border-dark-border text-xs text-slate-300 rounded-lg px-3 py-2.5">
-              {currentUserName}
-            </p>
-          </div>
-
-          <div className="flex items-center justify-end gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-lg bg-dark-card border border-dark-border text-xs font-medium text-slate-300 hover:bg-dark-border/50 transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-4 py-2 rounded-lg bg-brand-teal text-slate-950 font-semibold text-xs hover:bg-brand-teal-light transition-colors disabled:opacity-50"
-            >
-              {saving ? "Guardando..." : "Guardar cambios"}
-            </button>
+            <div className="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <span className="text-xs text-slate-500">
+                <span className="text-indigo-400">*</span> Campos obligatorios
+              </span>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-700 bg-slate-800/40 text-xs font-semibold text-slate-200 hover:bg-slate-800 transition-colors whitespace-nowrap"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving || !hasChanges}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20 whitespace-nowrap"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  {saving ? "Guardando..." : "Guardar cambios"}
+                </button>
+              </div>
+            </div>
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

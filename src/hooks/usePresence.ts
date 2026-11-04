@@ -4,6 +4,7 @@ import {
   updateMyStatus,
 } from "../services/status.service";
 import type {
+  StatusChangeEvent,
   StatusSnapshot,
   UserStatusEntry,
   UserStatusType,
@@ -25,6 +26,7 @@ export interface PresenceApi {
   workSchedule: WorkScheduleInfo;
   loading: boolean;
   error: string | null;
+  lastStatusChange: StatusChangeEvent | null;
   refresh: () => Promise<void>;
   updateStatus: (
     status: UserStatusType,
@@ -46,19 +48,35 @@ export function usePresence(enabled: boolean): PresenceApi {
     useState<WorkScheduleInfo>(DEFAULT_SCHEDULE);
   const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
+  const [lastStatusChange, setLastStatusChange] =
+    useState<StatusChangeEvent | null>(null);
+  const entriesRef = useRef<Record<string, UserStatusEntry>>({});
+  const statusChangeId = useRef(0);
   const socketSnapshotReceived = useRef(false);
 
   const applySnapshot = useCallback((snapshot: StatusSnapshot) => {
-    setEntriesById(
-      Object.fromEntries(
-        snapshot.entries.map((entry) => [entry.userId, entry]),
-      ),
-    );
+    const next = Object.fromEntries(
+      snapshot.entries.map((entry) => [entry.userId, entry]),
+    ) as Record<string, UserStatusEntry>;
+
+    entriesRef.current = next;
+    setEntriesById(next);
     setWorkSchedule(snapshot.workSchedule);
   }, []);
 
   const handleChanged = useCallback((entry: UserStatusEntry) => {
-    setEntriesById((prev) => ({ ...prev, [entry.userId]: entry }));
+    const previous = entriesRef.current[entry.userId];
+    const next = { ...entriesRef.current, [entry.userId]: entry };
+
+    entriesRef.current = next;
+    setEntriesById(next);
+
+    statusChangeId.current += 1;
+    setLastStatusChange({
+      id: statusChangeId.current,
+      entry,
+      previous,
+    });
   }, []);
 
   const handleSnapshot = useCallback(
@@ -71,7 +89,9 @@ export function usePresence(enabled: boolean): PresenceApi {
 
   useEffect(() => {
     if (!enabled) {
+      entriesRef.current = {};
       setEntriesById({});
+      setLastStatusChange(null);
       setLoading(false);
       setError(null);
       return;
@@ -119,7 +139,10 @@ export function usePresence(enabled: boolean): PresenceApi {
   const updateStatus = useCallback(
     async (status: UserStatusType, activity?: string) => {
       const entry = await updateMyStatus(status, activity);
-      setEntriesById((prev) => ({ ...prev, [entry.userId]: entry }));
+      const next = { ...entriesRef.current, [entry.userId]: entry };
+
+      entriesRef.current = next;
+      setEntriesById(next);
       return entry;
     },
     [],
@@ -130,6 +153,7 @@ export function usePresence(enabled: boolean): PresenceApi {
     workSchedule,
     loading,
     error,
+    lastStatusChange,
     refresh,
     updateStatus,
   };

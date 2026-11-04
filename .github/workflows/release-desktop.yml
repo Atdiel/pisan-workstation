@@ -75,6 +75,8 @@ jobs:
           name: windows-installer
           path: |
             release/*/PISANTECH-Workstation-Windows-*-Setup.exe
+            release/*/PISANTECH-Workstation-Windows-*-Setup.exe.blockmap
+            release/*/latest.yml
             release/checksums.txt
           if-no-files-found: error
           retention-days: 7
@@ -90,6 +92,8 @@ jobs:
           generate_release_notes: true
           files: |
             release/*/PISANTECH-Workstation-Windows-*-Setup.exe
+            release/*/PISANTECH-Workstation-Windows-*-Setup.exe.blockmap
+            release/*/latest.yml
             release/checksums.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

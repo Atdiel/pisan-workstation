@@ -30,7 +30,7 @@ export default function DashboardView({
           {/* Bienvenida & Acción Rápida */}
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-white tracking-tight">
+              <h2 className="text-2xl font-bold text-slate-100 tracking-tight">
                 ¡{greeting}{userName ? `, ${userName}` : ""}!
               </h2>
               <p className="text-xs text-slate-400 mt-1">
@@ -52,7 +52,7 @@ export default function DashboardView({
                 <p className="text-xs font-medium text-slate-400">
                   Equipo Disponible
                 </p>
-                <h3 className="text-2xl font-bold text-white mt-1">
+                <h3 className="text-2xl font-bold text-slate-100 mt-1">
                   10{" "}
                   <span className="text-xs font-normal text-slate-400">
                     / 12
@@ -72,7 +72,7 @@ export default function DashboardView({
                 <p className="text-xs font-medium text-slate-400">
                   Proyectos Activos
                 </p>
-                <h3 className="text-2xl font-bold text-white mt-1">6</h3>
+                <h3 className="text-2xl font-bold text-slate-100 mt-1">6</h3>
                 <p className="text-[11px] text-amber-400 mt-2 font-medium">
                   1 con revisión pendiente
                 </p>
@@ -87,7 +87,7 @@ export default function DashboardView({
                 <p className="text-xs font-medium text-slate-400">
                   Avance Planner
                 </p>
-                <h3 className="text-2xl font-bold text-white mt-1">78%</h3>
+                <h3 className="text-2xl font-bold text-slate-100 mt-1">78%</h3>
                 <p className="text-[11px] text-emerald-400 mt-2 font-medium">
                   +12% esta semana
                 </p>
@@ -102,7 +102,7 @@ export default function DashboardView({
                 <p className="text-xs font-medium text-slate-400">
                   Credenciales SAP/VPN
                 </p>
-                <h3 className="text-2xl font-bold text-white mt-1">18</h3>
+                <h3 className="text-2xl font-bold text-slate-100 mt-1">18</h3>
                 <p className="text-[11px] text-slate-400 mt-2">
                   Último cambio: Hoy 10:30
                 </p>
@@ -120,7 +120,7 @@ export default function DashboardView({
               {/* Bloque: Estado de Trabajo Actual */}
               <div className="bg-dark-card border border-dark-border rounded-xl p-5 relative overflow-hidden">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-white">
+                  <h3 className="text-sm font-semibold text-slate-100">
                     Mi Estado de Trabajo Actual
                   </h3>
                   <button className="text-xs text-brand-teal hover:underline font-medium">
@@ -130,12 +130,12 @@ export default function DashboardView({
 
                 <div className="flex items-center justify-between bg-dark-bg/60 border border-dark-border rounded-lg p-4">
                   <div className="flex items-center gap-4">
-                    <div className="p-3 bg-brand-navy border border-brand-teal/30 rounded-lg text-brand-teal">
+                    <div className="p-3 bg-brand-navy border border-brand-teal/30 rounded-lg text-brand-teal-light">
                       <Clock className="w-6 h-6" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-white text-base">
+                        <span className="font-semibold text-slate-100 text-base">
                           Desarrollo ABAP S/4HANA
                         </span>
                         <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">
@@ -149,7 +149,7 @@ export default function DashboardView({
                   </div>
 
                   <div className="text-right">
-                    <span className="text-2xl font-mono font-bold text-white tracking-wider">
+                    <span className="text-2xl font-mono font-bold text-slate-100 tracking-wider">
                       03:45:12
                     </span>
                     <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mt-0.5">
@@ -162,7 +162,7 @@ export default function DashboardView({
               {/* Bloque: Proyectos / Módulos en Desarrollo */}
               <div className="bg-dark-card border border-dark-border rounded-xl p-5">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-white">
+                  <h3 className="text-sm font-semibold text-slate-100">
                     Proyectos en Curso
                   </h3>
                   <button className="text-xs text-brand-teal hover:underline font-medium">
@@ -207,7 +207,7 @@ export default function DashboardView({
               {/* Disponibilidad del Equipo */}
               <div className="bg-dark-card border border-dark-border rounded-xl p-5">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-semibold text-white">
+                  <h3 className="text-sm font-semibold text-slate-100">
                     Disponibilidad del Equipo
                   </h3>
                   <span className="text-xs text-slate-400">12 total</span>
@@ -265,7 +265,7 @@ export default function DashboardView({
 
               {/* Feed Corto de Avisos */}
               <div className="bg-dark-card border border-dark-border rounded-xl p-5">
-                <h3 className="text-sm font-semibold text-white mb-3">
+                <h3 className="text-sm font-semibold text-slate-100 mb-3">
                   Anuncios Recientes
                 </h3>
                 <div className="space-y-3 text-xs">
@@ -282,7 +282,7 @@ export default function DashboardView({
 
               {/* Botones de Acción Rápida (Quick Actions) */}
               <div className="bg-dark-card border border-dark-border rounded-xl p-5">
-                <h3 className="text-sm font-semibold text-white mb-3">
+                <h3 className="text-sm font-semibold text-slate-100 mb-3">
                   Acciones Rápidas
                 </h3>
                 <div className="grid grid-cols-2 gap-2">

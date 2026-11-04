@@ -33,10 +33,10 @@ export function MasterKeyModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-[#111927] border border-dark-border rounded-xl p-6 w-full max-w-md shadow-2xl relative space-y-5">
+      <div className="bg-dark-card border border-dark-border rounded-xl p-6 w-full max-w-md shadow-2xl relative space-y-5">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1 rounded-lg text-slate-400 hover:text-white hover:bg-dark-card transition-colors"
+          className="absolute top-4 right-4 p-1 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-dark-card transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
@@ -45,7 +45,7 @@ export function MasterKeyModal({
           <div className="w-10 h-10 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center mx-auto">
             <Lock className="w-5 h-5" />
           </div>
-          <h2 className="text-lg font-bold text-white">
+          <h2 className="text-lg font-bold text-slate-100">
             Confirmar Clave Maestra
           </h2>
           <p className="text-xs text-slate-400 leading-relaxed px-2">
@@ -70,7 +70,7 @@ export function MasterKeyModal({
                 onChange={(e) => onMasterKeyChange(e.target.value)}
                 placeholder="Escribe tu contraseña..."
                 autoFocus
-                className="w-full bg-dark-bg border border-dark-border text-xs text-white rounded-lg pl-9 pr-10 py-2.5 focus:outline-none focus:border-indigo-500 transition-colors"
+                className="w-full bg-dark-bg border border-dark-border text-xs text-slate-100 rounded-lg pl-9 pr-10 py-2.5 focus:outline-none focus:border-indigo-500 transition-colors"
               />
               <button
                 type="button"

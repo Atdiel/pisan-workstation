@@ -20,18 +20,9 @@ import { SetupMasterKeyModal } from "./components/SetupMasterKeyModal";
 import { StatsCards, VaultHeader } from "./components/VaultHeader";
 import { VaultToolbar } from "./components/VaultToolbar";
 
-interface CurrentUser {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-}
-
 export default function VaultView({
-  currentUser,
   onMasterKeyRecovery,
 }: {
-  currentUser?: CurrentUser | null;
   onMasterKeyRecovery?: () => void;
 }) {
   const { credentials, loading, create, update, remove } = useCredentials();
@@ -213,7 +204,6 @@ export default function VaultView({
         open={isCreateOpen}
         form={createForm}
         saving={savingCreate}
-        currentUserName={currentUser?.name ?? "—"}
         onChange={setCreateForm}
         onClose={() => setIsCreateOpen(false)}
         onSubmit={handleCreate}
@@ -230,7 +220,6 @@ export default function VaultView({
         credential={editingCred}
         form={editForm}
         saving={savingEdit}
-        currentUserName={currentUser?.name ?? "—"}
         onChange={setEditForm}
         onClose={() => setEditingCred(null)}
         onSubmit={handleSaveEdit}

@@ -20,7 +20,7 @@ export function VaultHeader({ onAdd }: { onAdd: () => void }) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-white">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-100">
           Bóveda de Credenciales Segura
         </h1>
         <p className="text-xs text-slate-400 mt-1">
@@ -29,10 +29,6 @@ export function VaultHeader({ onAdd }: { onAdd: () => void }) {
         </p>
       </div>
       <div className="flex items-center gap-3">
-        {/* <button className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-dark-card border border-dark-border text-xs font-medium text-slate-300 hover:bg-dark-border/50 transition-colors">
-          <ShieldAlert className="w-3.5 h-3.5 text-brand-teal" />
-          Auditoría de seguridad
-        </button> */}
         <button
           onClick={onAdd}
           className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-brand-teal text-slate-950 font-semibold text-xs hover:bg-brand-teal-light transition-colors shadow-lg shadow-brand-teal/20"
@@ -57,7 +53,7 @@ export function StatsCards() {
           <p className="text-[11px] text-slate-400 font-medium">
             Total de credenciales
           </p>
-          <p className="text-2xl font-bold text-white mt-1">
+          <p className="text-2xl font-bold text-slate-100 mt-1">
             {value(metrics.total)}
           </p>
         </div>
@@ -71,7 +67,7 @@ export function StatsCards() {
           <p className="text-[11px] text-slate-400 font-medium">
             Rotadas este mes
           </p>
-          <p className="text-2xl font-bold text-white mt-1">
+          <p className="text-2xl font-bold text-slate-100 mt-1">
             {value(metrics.rotatedThisMonth)}
           </p>
         </div>
@@ -99,7 +95,7 @@ export function StatsCards() {
           <p className="text-[11px] text-slate-400 font-medium">
             Accesos nuevos
           </p>
-          <p className="text-2xl font-bold text-white mt-1">
+          <p className="text-2xl font-bold text-slate-100 mt-1">
             {value(metrics.newAccesses)}
           </p>
         </div>
